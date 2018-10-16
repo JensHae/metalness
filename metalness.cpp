@@ -42,7 +42,7 @@ void putPixel(float x, float y, const Color &c) {
 /// @param reflection The reflection color.
 /// @param ior The index of refraction.
 /// @param cs The cosine between the viewing angle and the surface normal.
-/// @return The reflectio strength.
+/// @return The reflection strength.
 Color getVRayMetallicFresnel(const Color &base, const Color &reflection, float ior, float cs) {
 	const simd::Vector3f viewDir(sqrtf(1.0f-cs*cs), 0.0f, -cs);
 	const simd::Vector3f normal(0.0f, 0.0f, 1.0f);
