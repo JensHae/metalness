@@ -107,7 +107,8 @@ float olefresnel(float r, float g, float c) {
 
 /// Artist-Friendly Metallic Fresnel by Ole Gulbrandsen, for comparison purposes against
 /// our implementation. Works by trying to estimate the n and k values with some plausible
-/// formula and then using those n and k values to compute the Fresnel effect.
+/// formula and then using those n and k values to compute the Fresnel effect. See
+/// http://jcgt.org/published/0003/04/03/paper.pdf for more information.
 /// @param base The base color.
 /// @param reflection The grazing angle reflection color (usually white).
 /// @param cos_theta Angle between the viewing direction and the surface normal.
@@ -298,10 +299,10 @@ DWORD WINAPI renderCycle(LPVOID param) {
 		for (int xs=1; xs<N; xs++) {
 			float x=float(xs)/float(N);
 
-			// Get the VRayMtl metalic Fresnel value based on the computed best IOR.
+			// Get the VRayMtl metallic Fresnel value based on the computed best IOR.
 			Color vrayMetallicFresnel=getVRayMetallicFresnel(base, reflection, ior, x);
 			
-			// Get the Ole metalic Fresnel version based only on the colors.
+			// Get the Ole metallic Fresnel version based only on the colors.
 			Color oleMetallicFresnel=getOleMetallicFresnel(base, reflection, x);
 
 			// Get the actual complex Fresnel value based on the n and k values.
