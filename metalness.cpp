@@ -121,6 +121,27 @@ Color getOleMetallicFresnel(const Color &base, const Color &reflection, float co
 	return result;
 }
 
+float getOleEdgeFloat(float n, float r) {
+	float g_num = ((1 + sqrt(r)) / (1 - sqrt(r))) - n;
+	float g_den = ((1 + sqrt(r)) / (1 - sqrt(r))) - ((1 - r) / (1 + r));
+	float g = g_num / g_den;
+	return g;
+}
+
+/// Artist-Friendly Metallic Fresnel by Ole Gulbrandsen, Creates the edgeTint (g)
+/// formula uses the base and n to derive the edgetint
+/// see formula 15 in https://jcgt.org/published/0003/04/03/paper.pdf
+/// @param base is the reflectivity(r) in gulbrandsen
+/// @param n the n value
+Color getOleEdgeTint(const Color &base, const Color &n) {
+	Color result = Color(
+		getOleEdgeFloat(n.r, base.r),
+		getOleEdgeFloat(n.g, base.g),
+		getOleEdgeFloat(n.b, base.b)
+	);
+	return result;
+}
+
 /// Compute reflection strength from complex index of refraction for one wavelength.
 /// @param n The n value.
 /// @param k The k value.
@@ -281,6 +302,9 @@ DWORD WINAPI renderCycle(LPVOID param) {
 		// The base reflection color when looking directly at the surface along the normal.
 		Color base=getComplexFresnel(n, k, 1.0f);
 
+		// The edgetint (g) for gulbrandsen fresnel
+		Color edgeTint = getOleEdgeTint(base, n);
+
 		// Find an IOR value for the VRayMtl material for these n and k values.
 		float ior=findIOR(n, k);
 		
@@ -303,7 +327,7 @@ DWORD WINAPI renderCycle(LPVOID param) {
 			Color vrayMetallicFresnel=getVRayMetallicFresnel(base, reflection, ior, x);
 			
 			// Get the Ole metallic Fresnel version based only on the colors.
-			Color oleMetallicFresnel=getOleMetallicFresnel(base, reflection, x);
+			Color oleMetallicFresnel=getOleMetallicFresnel(base, edgeTint, x);
 
 			// Get the actual complex Fresnel value based on the n and k values.
 			Color complexFresnel=getComplexFresnel(n, k, x);
